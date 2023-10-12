@@ -1,0 +1,58 @@
+# Define the Parser class
+class Parser:
+    def __init__(self, text):
+        self.tokens = text.replace(' ', '')  # Remove spaces
+        self.current_token = 0
+    
+    # Consume the current token and move to the next token
+    def eat(self):
+        self.current_token += 1
+    
+    # Parse an expression
+    def expr(self):
+        result = self.term()
+        
+        while self.current_token < len(self.tokens) and self.tokens[self.current_token] in ['+', '-']:
+            operator = self.tokens[self.current_token]
+            self.eat()
+            
+            if operator == '+':
+                result += self.term()
+            else:  # operator == '-'
+                result -= self.term()
+        
+        return result
+    
+    # Parse a term
+    def term(self):
+        result = self.factor()
+        
+        while self.current_token < len(self.tokens) and self.tokens[self.current_token] in ['*', '/']:
+            operator = self.tokens[self.current_token]
+            self.eat()
+            
+            if operator == '*':
+                result *= self.factor()
+            else:  # operator == '/'
+                result /= self.factor()
+        
+        return result
+    
+    # Parse a factor
+    def factor(self):
+        if self.tokens[self.current_token].isdigit():
+            result = int(self.tokens[self.current_token])
+            self.eat()
+            return result
+        else:
+            raise SyntaxError(f"Expected a number, got '{self.tokens[self.current_token]}'")
+
+# Create an instance of the Parser class and parse an expression
+parser = Parser("2 + 3 * 4")
+
+try:
+    result = parser.expr()
+    print("Parsing successful!")
+    print("Result:", result)
+except SyntaxError as e:
+    print("Parsing failed:", e)
